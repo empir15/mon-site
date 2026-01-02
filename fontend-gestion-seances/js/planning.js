@@ -2,15 +2,34 @@
  * Logique de Planification
  */
 
+let isEditMode = false;
+let editSeanceId = null;
+
 document.addEventListener('DOMContentLoaded', async () => {
     requireAuth();
 
-    // Définir la date min à aujourd'hui
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('date').min = today;
+    // Gestion Mode Édition
+    const params = new URLSearchParams(window.location.search);
+    editSeanceId = params.get('id');
+    isEditMode = !!editSeanceId;
 
-    // Charger les listes déroulantes
+    if (isEditMode) {
+        document.querySelector('.page-title').textContent = 'Modifier la séance';
+        document.querySelector('.page-subtitle').textContent = 'Mettre à jour les informations de la séance';
+        document.querySelector('button[type="submit"]').textContent = 'Mettre à jour';
+    } else {
+        // Mode Création : Date min par défaut
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').min = today;
+    }
+
+    // Charger les listes déroulantes (et les séances existantes pour conflits)
     await loadOptions();
+
+    // Si édition, pré-remplir le formulaire
+    if (isEditMode) {
+        await loadSeanceData(editSeanceId);
+    }
 
     // Écouteurs d'événements
     document.getElementById('planningForm').addEventListener('submit', handlePlanningSubmit);
@@ -20,14 +39,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     inputs.forEach(id => {
         document.getElementById(id).addEventListener('change', checkAvailability);
     });
+
+    // Vérifier disponibilité initiale si édition
+    if (isEditMode) {
+        // Petit délai pour laisser le temps au DOM de se mettre à jour
+        setTimeout(checkAvailability, 500);
+    }
 });
+
+let existingSeances = [];
 
 async function loadOptions() {
     try {
-        const [users, salles] = await Promise.all([
+        const [users, salles, seances] = await Promise.all([
             API.users.getAll(),
-            API.salles.getAll()
+            API.salles.getAll(),
+            API.seances.getAll()
         ]);
+
+        existingSeances = seances;
 
         // Peupler enseignants
         const enseignantSelect = document.getElementById('enseignant');
@@ -35,7 +65,7 @@ async function loadOptions() {
             .filter(u => u.role === 'ENSEIGNANT')
             .forEach(eng => {
                 const opt = document.createElement('option');
-                opt.value = eng.id; // Note: l'API devrait idéalement retourner l'ID enseignant, ou on gérera ça côté serveur
+                opt.value = eng.id;
                 opt.textContent = eng.nom;
                 enseignantSelect.appendChild(opt);
             });
@@ -55,6 +85,36 @@ async function loadOptions() {
     }
 }
 
+async function loadSeanceData(id) {
+    try {
+        // On cherche dans existingSeances qui est déjà chargé
+        // ID est string dans URL mais peut etre number dans DB. Comparaison souple.
+        const seance = existingSeances.find(s => s.id == id);
+
+        if (!seance) {
+            throw new Error('Séance non trouvée');
+        }
+
+        // Remplir le formulaire
+        document.getElementById('date').value = seance.date;
+        document.getElementById('heure_debut').value = seance.heure_debut;
+        document.getElementById('heure_fin').value = seance.heure_fin;
+        document.getElementById('groupe').value = seance.groupe;
+        document.getElementById('enseignant').value = seance.enseignant_id;
+        document.getElementById('salle').value = seance.salle_id;
+        document.getElementById('commentaire').value = seance.commentaire || '';
+
+        // Radio buttons
+        const radio = document.querySelector(`input[name="type"][value="${seance.type}"]`);
+        if (radio) radio.checked = true;
+
+    } catch (error) {
+        console.error('Erreur chargement séance:', error);
+        showNotification('Impossible de charger la séance', 'error');
+        setTimeout(() => window.location.href = 'emploi-du-temps.html', 2000);
+    }
+}
+
 async function checkAvailability() {
     const date = document.getElementById('date').value;
     const start = document.getElementById('heure_debut').value;
@@ -62,22 +122,58 @@ async function checkAvailability() {
     const teacherId = document.getElementById('enseignant').value;
     const roomId = document.getElementById('salle').value;
 
-    if (!date || !start || !end || !teacherId || !roomId) return;
-
-    // TODO: Appel API pour vérifier spécifiquement les conflits (endpoint à créer ou logique frontend)
-    // Pour l'instant, on simule une vérification "OK" visuelle
-    // L'API `create` renverra une erreur 409 en cas de conflit réel
-
     const statusDiv = document.getElementById('availabilityStatus');
-    statusDiv.innerHTML = `
-        <div style="text-align: center; color: var(--gray);">
-            <div class="spinner-small" style="margin: 0 auto 10px;"></div>
-            Vérification...
-        </div>
-    `;
 
-    // Simulation délai
-    setTimeout(() => {
+    if (!date || !start || !end) {
+        statusDiv.innerHTML = `
+            <div class="empty-state">
+                <p>Remplissez la date et les heures pour vérifier</p>
+            </div>
+        `;
+        return;
+    }
+
+    if (start >= end) {
+        statusDiv.innerHTML = `
+            <div class="alert negative" style="margin: 0; background: #fff5f5; border-color: #feb2b2; color: #c53030;">
+                <span>L'heure de début doit être avant l'heure de fin</span>
+            </div>
+        `;
+        return;
+    }
+
+    // Vérification des conflits
+    const conflits = existingSeances.filter(s => {
+        // En mode édition, s'exclure soi-même
+        if (isEditMode && s.id == editSeanceId) return false;
+
+        if (s.date !== date) return false;
+
+        // Vérification Chevauchement Heures
+        const overlap = start < s.heure_fin && end > s.heure_debut;
+        if (!overlap) return false;
+
+        const conflictSalle = roomId && s.salle_id == roomId;
+        const conflictProf = teacherId && s.enseignant_id == teacherId;
+
+        return conflictSalle || conflictProf;
+    });
+
+    if (conflits.length > 0) {
+        const details = conflits.map(c => {
+            const raison = c.salle_id == roomId ? `Salle ${c.salle_nom || 'occupée'}` : `Enseignant ${c.enseignant_nom || 'occupé'}`;
+            return `${raison} (${c.heure_debut} - ${c.heure_fin})`;
+        }).join(', ');
+
+        statusDiv.innerHTML = `
+            <div class="alert negative" style="margin: 0; background: #fff5f5; border-color: #feb2b2; color: #c53030;">
+                 <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
+                </svg>
+                <span>Conflit détecté: ${details}</span>
+            </div>
+        `;
+    } else {
         statusDiv.innerHTML = `
             <div class="alert success" style="margin: 0;">
                 <svg class="alert-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -86,7 +182,7 @@ async function checkAvailability() {
                 <span>Créneau disponible</span>
             </div>
         `;
-    }, 500);
+    }
 }
 
 async function handlePlanningSubmit(e) {
@@ -104,8 +200,14 @@ async function handlePlanningSubmit(e) {
     };
 
     try {
-        await API.seances.create(data);
-        showNotification('Séance planifiée avec succès !', 'success');
+        if (isEditMode) {
+            await API.seances.update(editSeanceId, data);
+            showNotification('Séance mise à jour avec succès !', 'success');
+        } else {
+            await API.seances.create(data);
+            showNotification('Séance planifiée avec succès !', 'success');
+        }
+
         setTimeout(() => {
             window.location.href = 'emploi-du-temps.html';
         }, 1500);

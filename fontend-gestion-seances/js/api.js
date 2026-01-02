@@ -2,7 +2,9 @@
  * API Helper - Gestion des appels API vers le backend
  */
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'http://127.0.0.1:3000/api';
+
+
 
 /**
  * Wrapper pour les requêtes fetch avec gestion d'erreurs
@@ -41,6 +43,12 @@ async function apiRequest(endpoint, options = {}) {
         return await response.json();
     } catch (error) {
         console.error('API Request Error:', error);
+
+        // Erreur de connexion (serveur éteint ou inaccessible)
+        if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+            throw new Error('Impossible de contacter le serveur. Vérifiez que le backend est démarré (port 3000).');
+        }
+
         throw error;
     }
 }

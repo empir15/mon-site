@@ -73,7 +73,28 @@ async function loadStats() {
         updateStat('totalSeances', seancesSemaine.length);
         updateStat('totalEnseignants', enseignants.length);
         updateStat('totalSalles', salles.length);
-        updateStat('conflitsDetectes', 0); // TODO: implémenter détection
+
+        // Détection des conflits (simple scan)
+        let conflitsCount = 0;
+        for (let i = 0; i < seances.length; i++) {
+            for (let j = i + 1; j < seances.length; j++) {
+                const s1 = seances[i];
+                const s2 = seances[j];
+
+                // Même jour
+                if (s1.date !== s2.date) continue;
+
+                // Chevauchement horaire
+                const overlap = s1.heure_debut < s2.heure_fin && s1.heure_fin > s2.heure_debut;
+                if (!overlap) continue;
+
+                // Conflit si même salle ou même enseignant
+                if (s1.salle_id === s2.salle_id || s1.enseignant_id === s2.enseignant_id) {
+                    conflitsCount++;
+                }
+            }
+        }
+        updateStat('conflitsDetectes', conflitsCount);
 
     } catch (error) {
         console.error('Erreur chargement stats:', error);
