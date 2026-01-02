@@ -1,0 +1,57 @@
+CREATE DATABASE IF NOT EXISTS gestion_seances_db;
+USE gestion_seances_db;
+
+-- Table UTILISATEUR
+CREATE TABLE IF NOT EXISTS utilisateur (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    mot_de_passe VARCHAR(255) NOT NULL,
+    role ENUM('CHEF_DEPARTEMENT', 'ENSEIGNANT', 'SECRETAIRE', 'ETUDIANT', 'SYSTEME') NOT NULL DEFAULT 'ETUDIANT',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table ENSEIGNANT
+CREATE TABLE IF NOT EXISTS enseignant (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    utilisateur_id INT NOT NULL,
+    grade VARCHAR(100),
+    specialite VARCHAR(255),
+    FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(id) ON DELETE CASCADE
+);
+
+-- Table SALLE
+CREATE TABLE IF NOT EXISTS salle (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL UNIQUE,
+    capacite INT NOT NULL,
+    equipements TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table SEANCE
+CREATE TABLE IF NOT EXISTS seance (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    type ENUM('COURS', 'TD', 'TP') NOT NULL,
+    date DATE NOT NULL,
+    heure_debut TIME NOT NULL,
+    heure_fin TIME NOT NULL,
+    statut ENUM('PLANIFIEE', 'EFFECTUEE', 'ANNULEE', 'REPORTEE') DEFAULT 'PLANIFIEE',
+    enseignant_id INT NOT NULL,
+    salle_id INT NOT NULL,
+    groupe VARCHAR(100),
+    commentaire TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (enseignant_id) REFERENCES enseignant(id),
+    FOREIGN KEY (salle_id) REFERENCES salle(id)
+);
+
+-- Table NOTIFICATION
+CREATE TABLE IF NOT EXISTS notification (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    utilisateur_id INT NOT NULL,
+    message TEXT NOT NULL,
+    date_envoi TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    lu BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(id) ON DELETE CASCADE
+);

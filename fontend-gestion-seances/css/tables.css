@@ -1,0 +1,498 @@
+/* ===========================
+   Tables & Data Display
+   =========================== */
+
+.filters-bar {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.search-box {
+    flex: 1;
+    min-width: 300px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-box svg {
+    position: absolute;
+    left: 1rem;
+    color: var(--gray);
+    pointer-events: none;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 3rem;
+    font-size: 1rem;
+    font-family: var(--font-primary);
+    color: var(--dark);
+    background: var(--white);
+    border: 2px solid var(--gray-lighter);
+    border-radius: var(--radius-md);
+    transition: var(--transition-base);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Table Styles */
+.table-container {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+}
+
+.data-table thead {
+    background: var(--bg);
+    border-bottom: 2px solid var(--gray-lighter);
+}
+
+.data-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: var(--font-weight-semibold);
+    color: var(--dark);
+    white-space: nowrap;
+}
+
+.data-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-lighter);
+    color: var(--gray);
+}
+
+.data-table tbody tr {
+    transition: var(--transition-base);
+}
+
+.data-table tbody tr:hover {
+    background: rgba(102, 126, 234, 0.02);
+}
+
+/* Role Badge */
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.875rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: var(--font-weight-medium);
+}
+
+.role-badge.chef {
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--primary);
+}
+
+.role-badge.enseignant {
+    background: rgba(79, 172, 254, 0.1);
+    color: #2c7a99;
+}
+
+.role-badge.secretaire {
+    background: rgba(240, 147, 251, 0.1);
+    color: #9f3ab7;
+}
+
+/* Action Buttons */
+.table-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition-base);
+    background: transparent;
+}
+
+.btn-icon.edit {
+    color: var(--primary);
+}
+
+.btn-icon.edit:hover {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.btn-icon.delete {
+    color: #c53030;
+}
+
+.btn-icon.delete:hover {
+    background: rgba(245, 87, 108, 0.1);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: var(--white);
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ===========================
+   Modal Styles
+   =========================== */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 32, 44, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    position: relative;
+    background: var(--white);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-2xl);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-small {
+    max-width: 450px;
+}
+
+.modal-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--gray-lighter);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--dark);
+}
+
+.modal-close {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--gray);
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.modal-close:hover {
+    background: var(--bg);
+    color: var(--dark);
+}
+
+.modal-body {
+    padding: var(--spacing-lg);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-footer {
+    padding: var(--spacing-lg);
+    border-top: 1px solid var(--gray-lighter);
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+}
+
+/* Form in Modal */
+.modal-body .form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.modal-body .form-group:last-of-type {
+    margin-bottom: 0;
+}
+
+/* ===========================
+   Status Badge
+   =========================== */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.375rem 0.875rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: var(--font-weight-medium);
+}
+
+.status-badge.disponible,
+.status-badge.planifiee {
+    background: rgba(72, 187, 120, 0.1);
+    color: #2f855a;
+}
+
+.status-badge.occupee,
+.status-badge.effectuee {
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--primary);
+}
+
+.status-badge.maintenance,
+.status-badge.annulee {
+    background: rgba(245, 87, 108, 0.1);
+    color: #c53030;
+}
+
+.status-badge.reportee {
+    background: rgba(237, 137, 54, 0.1);
+    color: #c05621;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+/* ===========================
+   Capacity Bar
+   =========================== */
+
+.capacity-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.capacity-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--gray-lighter);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.capacity-fill {
+    height: 100%;
+    background: var(--gradient-primary);
+    border-radius: 999px;
+    transition: width 0.5s ease;
+}
+
+.capacity-fill.high {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.capacity-text {
+    font-size: 0.875rem;
+    color: var(--gray);
+    white-space: nowrap;
+}
+
+/* ===========================
+   Calendar Styles
+   =========================== */
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background: var(--bg);
+    border-radius: var(--radius-lg);
+}
+
+.calendar-nav {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.calendar-nav button {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--white);
+    border: 1px solid var(--gray-lighter);
+    border-radius: var(--radius-md);
+    color: var(--gray);
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.calendar-nav button:hover {
+    background: var(--primary);
+    color: var(--white);
+    border-color: var(--primary);
+}
+
+.calendar-title {
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--dark);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: var(--gray-lighter);
+    border: 1px solid var(--gray-lighter);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.calendar-day-header {
+    background: var(--bg);
+    padding: var(--spacing-sm);
+    text-align: center;
+    font-weight: var(--font-weight-semibold);
+    font-size: 0.875rem;
+    color: var(--gray);
+}
+
+.calendar-day {
+    background: var(--white);
+    min-height: 100px;
+    padding: var(--spacing-xs);
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.calendar-day:hover {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.calendar-day.other-month {
+    background: var(--bg);
+    opacity: 0.5;
+}
+
+.calendar-day.today {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.day-number {
+    font-weight: var(--font-weight-semibold);
+    color: var(--dark);
+    margin-bottom: var(--spacing-xs);
+}
+
+.day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.event-pill {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: var(--primary);
+    color: var(--white);
+}
+
+/* ===========================
+   Responsive
+   =========================== */
+
+@media (max-width: 768px) {
+    .filters-bar {
+        flex-direction: column;
+    }
+
+    .search-box {
+        min-width: 100%;
+    }
+
+    .data-table {
+        font-size: 0.875rem;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 0.75rem;
+    }
+
+    .modal-content {
+        width: 95%;
+        max-height: 95vh;
+    }
+
+    .calendar-grid {
+        gap: 0;
+    }
+
+    .calendar-day {
+        min-height: 80px;
+    }
+}

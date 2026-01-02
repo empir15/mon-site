@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Système de gestion des séances - Département d'Informatique, Université de Yaoundé I">
+    <title>Gestion des Séances - Université de Yaoundé I</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="landing-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <svg class="logo-icon" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect x="4" y="4" width="24" height="24" rx="4" fill="currentColor" opacity="0.2" />
+                    <path d="M12 10h8M12 16h8M12 22h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+                <span class="logo-text">SeancePlus</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Fonctionnalités</a>
+                <a href="#about" class="nav-link">À propos</a>
+                <a href="login.html" class="btn btn-primary">Se connecter</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0l2.5 5 5.5 0.8-4 3.9 0.9 5.3-4.9-2.6-4.9 2.6 0.9-5.3-4-3.9 5.5-0.8z" />
+                    </svg>
+                    <span>Nouveau système 2025</span>
+                </div>
+                <h1 class="hero-title">
+                    Gestion Intelligente des <span class="gradient-text">Séances de Cours</span>
+                </h1>
+                <p class="hero-description">
+                    Planifiez, organisez et suivez toutes vos séances en temps réel.
+                    Détection automatique des conflits, emplois du temps optimisés,
+                    et communication fluide entre enseignants et administration.
+                </p>
+                <div class="hero-actions">
+                    <a href="login.html" class="btn btn-large btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path
+                                d="M10 0C4.5 0 0 4.5 0 10s4.5 10 10 10 10-4.5 10-10S15.5 0 10 0zm0 3c1.7 0 3 1.3 3 3s-1.3 3-3 3-3-1.3-3-3 1.3-3 3-3zm0 14c-2.5 0-4.7-1.3-6-3.3.1-2 4-3.1 6-3.1s5.9 1.1 6 3.1c-1.3 2-3.5 3.3-6 3.3z" />
+                        </svg>
+                        Accéder à mon espace
+                    </a>
+                    <a href="#features" class="btn btn-large btn-outline">
+                        En savoir plus
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 3l-1.5 1.5L13 9H3v2h10l-4.5 4.5L10 17l7-7-7-7z" />
+                        </svg>
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-value">500+</div>
+                        <div class="stat-label">Séances par semestre</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">50+</div>
+                        <div class="stat-label">Enseignants</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">98%</div>
+                        <div class="stat-label">Sans conflit</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="dashboard-preview">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <div class="preview-title">Tableau de bord</div>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-card">
+                            <div class="card-icon"
+                                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" stroke="white" stroke-width="2"
+                                        fill="none" />
+                                    <line x1="16" y1="2" x2="16" y2="6" stroke="white" stroke-width="2"
+                                        stroke-linecap="round" />
+                                    <line x1="8" y1="2" x2="8" y2="6" stroke="white" stroke-width="2"
+                                        stroke-linecap="round" />
+                                    <line x1="3" y1="10" x2="21" y2="10" stroke="white" stroke-width="2" />
+                                </svg>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-value">24</div>
+                                <div class="card-label">Séances cette semaine</div>
+                            </div>
+                        </div>
+                        <div class="preview-card">
+                            <div class="card-icon"
+                                style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="white" stroke-width="2"
+                                        stroke-linecap="round" />
+                                    <circle cx="12" cy="7" r="4" stroke="white" stroke-width="2" fill="none" />
+                                </svg>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-value">12</div>
+                                <div class="card-label">Enseignants actifs</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Fonctionnalités principales</h2>
+                <p class="section-description">
+                    Tout ce dont vous avez besoin pour gérer efficacement vos séances
+                </p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Planification intelligente</h3>
+                    <p class="feature-description">
+                        Créez et organisez vos séances en quelques clics avec détection automatique des conflits
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Temps réel</h3>
+                    <p class="feature-description">
+                        Notifications instantanées pour tous les changements d'emploi du temps
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                            <line x1="12" y1="22.08" x2="12" y2="12" />
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Gestion des salles</h3>
+                    <p class="feature-description">
+                        Vue d'ensemble de la disponibilité et de l'occupation de toutes les salles
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23" />
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Statistiques & Rapports</h3>
+                    <p class="feature-description">
+                        Analyses détaillées et exports PDF pour le suivi pédagogique
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Multi-utilisateurs</h3>
+                    <p class="feature-description">
+                        Rôles différenciés pour Chef, Enseignants et Secrétariat
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="2" y="7" width="20" height="14" rx="2" />
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Responsive</h3>
+                    <p class="feature-description">
+                        Accessible depuis ordinateur, tablette ou smartphone
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2 class="about-title">À propos du système</h2>
+                    <p class="about-description">
+                        Le Département d'Informatique de l'Université de Yaoundé I a développé
+                        ce système pour répondre à la croissance importante du nombre d'étudiants
+                        et la complexification de la gestion des emplois du temps.
+                    </p>
+                    <p class="about-description">
+                        Cette solution centralisée permet de planifier, organiser et suivre
+                        toutes les séances de cours et TD, tout en simplifiant la communication
+                        entre administration et enseignants.
+                    </p>
+                    <ul class="about-list">
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 0C4.5 0 0 4.5 0 10s4.5 10 10 10 10-4.5 10-10S15.5 0 10 0zm-1.5 15L3 9.5l1.4-1.4 4.1 4.1L16.1 5 17.5 6.4 8.5 15z" />
+                            </svg>
+                            Éviter les conflits d'emplois du temps
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 0C4.5 0 0 4.5 0 10s4.5 10 10 10 10-4.5 10-10S15.5 0 10 0zm-1.5 15L3 9.5l1.4-1.4 4.1 4.1L16.1 5 17.5 6.4 8.5 15z" />
+                            </svg>
+                            Optimiser l'utilisation des salles
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 0C4.5 0 0 4.5 0 10s4.5 10 10 10 10-4.5 10-10S15.5 0 10 0zm-1.5 15L3 9.5l1.4-1.4 4.1 4.1L16.1 5 17.5 6.4 8.5 15z" />
+                            </svg>
+                            Suivre les séances effectuées
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 0C4.5 0 0 4.5 0 10s4.5 10 10 10 10-4.5 10-10S15.5 0 10 0zm-1.5 15L3 9.5l1.4-1.4 4.1 4.1L16.1 5 17.5 6.4 8.5 15z" />
+                            </svg>
+                            Générer des statistiques utiles
+                        </li>
+                    </ul>
+                    <a href="login.html" class="btn btn-primary btn-large">Commencer maintenant</a>
+                </div>
+                <div class="about-visual">
+                    <div class="visual-card">
+                        <div class="visual-header">
+                            <div class="visual-icon">📊</div>
+                            <div class="visual-title">Université de Yaoundé I</div>
+                        </div>
+                        <div class="visual-body">
+                            <div class="visual-stat">
+                                <span class="stat-number">1962</span>
+                                <span class="stat-text">Année de création</span>
+                            </div>
+                            <div class="visual-stat">
+                                <span class="stat-number">60+</span>
+                                <span class="stat-text">Années d'excellence</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <svg class="logo-icon" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <rect x="4" y="4" width="24" height="24" rx="4" fill="currentColor" opacity="0.2" />
+                        <path d="M12 10h8M12 16h8M12 22h5" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
+                    </svg>
+                    <div>
+                        <div class="logo-text">SeancePlus</div>
+                        <p class="footer-tagline">Gestion moderne des emplois du temps</p>
+                    </div>
+                </div>
+                <div class="footer-info">
+                    <p>&copy; 2025 Département d'Informatique - Université de Yaoundé I</p>
+                    <p>Tous droits réservés</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API - SeancePlus</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f7fafc;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .test-section h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .success {
+            background: #e6ffed;
+            color: #2f855a;
+            border: 1px solid #9ae6b4;
+        }
+
+        .error {
+            background: #fff5f5;
+            color: #c53030;
+            border: 1px solid #fc8181;
+        }
+
+        .info {
+            background: #ebf8ff;
+            color: #2c5282;
+            border: 1px solid #90cdf4;
+        }
+
+        .credentials {
+            background: #faf089;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+
+        .credentials h3 {
+            margin-top: 0;
+            color: #744210;
+        }
+
+        .cred-item {
+            font-family: 'Courier New', monospace;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🧪 Test API Backend</h1>
+        <p class="subtitle">Vérification de la connexion au serveur et à la base de données</p>
+
+        <div class="credentials">
+            <h3>📋 Comptes de test (après import seed.sql)</h3>
+            <div class="cred-item"><strong>Chef :</strong> chef@dept-info.cm / admin123</div>
+            <div class="cred-item"><strong>Enseignant :</strong> j.kamga@dept-info.cm / prof123</div>
+            <div class="cred-item"><strong>Secrétaire :</strong> secretaire@dept-info.cm / secretaire123</div>
+        </div>
+
+        <!-- Test 1: Connexion serveur -->
+        <div class="test-section">
+            <h2>1️⃣ Test de connexion au serveur</h2>
+            <button onclick="testServerConnection()">Tester la connexion</button>
+            <div id="serverTest"></div>
+        </div>
+
+        <!-- Test 2: Login -->
+        <div class="test-section">
+            <h2>2️⃣ Test de connexion (Login)</h2>
+            <button onclick="testLogin('chef@dept-info.cm', 'admin123')">Login Chef</button>
+            <button onclick="testLogin('j.kamga@dept-info.cm', 'prof123')">Login Enseignant</button>
+            <div id="loginTest"></div>
+        </div>
+
+        <!-- Test 3: API avec token -->
+        <div class="test-section">
+            <h2>3️⃣ Test API protégée (nécessite login d'abord)</h2>
+            <button onclick="testGetUsers()">GET /api/users</button>
+            <button onclick="testGetSalles()">GET /api/salles</button>
+            <button onclick="testGetSeances()">GET /api/seances</button>
+            <div id="apiTest"></div>
+        </div>
+
+        <!-- Test 4: État actuel -->
+        <div class="test-section">
+            <h2>4️⃣ État de la session</h2>
+            <button onclick="checkSession()">Vérifier la session</button>
+            <button onclick="clearSession()">Effacer la session</button>
+            <div id="sessionTest"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+
+        async function testServerConnection() {
+            const resultDiv = document.getElementById('serverTest');
+            resultDiv.innerHTML = '<div class="result info">Test en cours...</div>';
+
+            try {
+                const response = await fetch(API_URL + '/auth/login', {
+                    method: 'OPTIONS'
+                });
+
+                if (response.ok || response.status === 404) {
+                    resultDiv.innerHTML = '<div class="result success">✅ Serveur accessible sur ' + API_URL + '</div>';
+                } else {
+                    throw new Error('Serveur non accessible');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="result error">❌ Erreur: ' + error.message + '\n\nVérifiez que le serveur backend est démarré:\ncd backend-gestion-seances\nnpm start</div>';
+            }
+        }
+
+        async function testLogin(email, password) {
+            const resultDiv = document.getElementById('loginTest');
+            resultDiv.innerHTML = '<div class="result info">Test de connexion pour ' + email + '...</div>';
+
+            try {
+                const response = await fetch(API_URL + '/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, motDePasse: password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify({ email, role: data.role }));
+
+                    resultDiv.innerHTML = '<div class="result success">✅ Connexion réussie!\n\nRôle: ' + data.role + '\nToken: ' + data.token.substring(0, 50) + '...</div>';
+                } else {
+                    throw new Error(data.message || 'Erreur de connexion');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="result error">❌ Erreur: ' + error.message + '\n\nVérifiez que:\n1. La base de données existe (gestion_seances_db)\n2. Les données de test sont chargées (seed.sql)\n3. Les credentials sont corrects</div>';
+            }
+        }
+
+        async function testGetUsers() {
+            await testProtectedEndpoint('/users', 'Liste des utilisateurs');
+        }
+
+        async function testGetSalles() {
+            await testProtectedEndpoint('/salles', 'Liste des salles');
+        }
+
+        async function testGetSeances() {
+            await testProtectedEndpoint('/seances', 'Liste des séances');
+        }
+
+        async function testProtectedEndpoint(endpoint, label) {
+            const resultDiv = document.getElementById('apiTest');
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                resultDiv.innerHTML = '<div class="result error">❌ Aucun token trouvé. Veuillez vous connecter d\'abord (Test 2)</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="result info">Chargement de ' + label + '...</div>';
+
+            try {
+                const response = await fetch(API_URL + endpoint, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.innerHTML = '<div class="result success">✅ ' + label + ' (' + (Array.isArray(data) ? data.length : 0) + ' résultats)\n\n' + JSON.stringify(data, null, 2).substring(0, 500) + '...</div>';
+                } else {
+                    throw new Error(data.message || 'Erreur API');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="result error">❌ Erreur: ' + error.message + '</div>';
+            }
+        }
+
+        function checkSession() {
+            const resultDiv = document.getElementById('sessionTest');
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+
+            if (token && user) {
+                try {
+                    const userData = JSON.parse(user);
+                    resultDiv.innerHTML = '<div class="result success">✅ Session active\n\nEmail: ' + userData.email + '\nRôle: ' + userData.role + '\nToken: ' + token.substring(0, 50) + '...</div>';
+                } catch (error) {
+                    resultDiv.innerHTML = '<div class="result error">❌ Session corrompue: ' + error.message + '</div>';
+                }
+            } else {
+                resultDiv.innerHTML = '<div class="result info">ℹ️ Aucune session active</div>';
+            }
+        }
+
+        function clearSession() {
+            localStorage.clear();
+            sessionStorage.clear();
+            document.getElementById('sessionTest').innerHTML = '<div class="result success">✅ Session effacée</div>';
+        }
+
+        // Auto-test au chargement
+        window.addEventListener('load', () => {
+            testServerConnection();
+            checkSession();
+        });
+    </script>
+</body>
+
+</html>

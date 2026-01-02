@@ -1,0 +1,12 @@
+{
+    "name": "frontend-gestion-seances",
+    "version": "1.0.0",
+    "description": "Frontend - Système de gestion des séances",
+    "scripts": {
+        "dev": "http-server -p 8080 -c-1 -o",
+        "start": "http-server -p 8080 -c-1"
+    },
+    "devDependencies": {
+        "http-server": "^14.1.1"
+    }
+}
