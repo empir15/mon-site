@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapports - SeancePlus</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="dashboard-page">
+    <aside class="sidebar">
+        <!-- Sidebar Identique... on pourrait utiliser un composant JS pour éviter la duplication, mais gardons simple -->
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <span class="logo-text">SeancePlus</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">Tableau de bord</a>
+            <a href="gestion-users.html" class="nav-item">Utilisateurs</a>
+            <a href="gestion-salles.html" class="nav-item">Salles</a>
+            <a href="planning.html" class="nav-item">Planification</a>
+            <a href="emploi-du-temps.html" class="nav-item">Emplois du temps</a>
+            <a href="rapports.html" class="nav-item active">Rapports</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="logout()">Déconnexion</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div class="header-left">
+                <h1 class="page-title">Rapports et Statistiques</h1>
+                <p class="page-subtitle">Analyse de l'activité pédagogique</p>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-outline" onclick="window.print()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    Imprimer / PDF
+                </button>
+            </div>
+        </header>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-content">
+                    <div class="stat-value" id="totalHours">0</div>
+                    <div class="stat-label">Heures planifiées (Total)</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-content">
+                    <div class="stat-value" id="occupancyRate">0%</div>
+                    <div class="stat-label">Taux occupation global</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="content-grid">
+            <!-- Table Volumes Horaires par Enseignant -->
+            <section class="card" style="grid-column: span 2;">
+                <div class="card-header">
+                    <h2 class="card-title">Volume horaire par enseignant</h2>
+                </div>
+                <div class="card-body">
+                    <table class="data-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Enseignant</th>
+                                <th>Cours (h)</th>
+                                <th>TD (h)</th>
+                                <th>TP (h)</th>
+                                <th>Total (h)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hoursTableBody">
+                            <!-- JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="../../js/api.js"></script>
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/rapports.js"></script>
+</body>
+
+</html>

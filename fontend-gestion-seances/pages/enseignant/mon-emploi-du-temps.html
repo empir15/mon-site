@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Emploi du temps - SeancePlus</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <!-- On réutilise le CSS table pour le calendrier -->
+    <style>
+        .timetable-week {
+            display: grid;
+            grid-template-columns: 60px repeat(6, 1fr);
+            gap: 1px;
+            background: var(--gray-lighter);
+            border: 1px solid var(--gray-lighter);
+            overflow-x: auto;
+        }
+
+        .time-col {
+            background: var(--bg);
+            padding: 5px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--gray);
+            border-bottom: 1px solid var(--gray-lighter);
+        }
+
+        .day-header {
+            background: var(--white);
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .day-col {
+            background: var(--white);
+            min-height: 600px;
+            position: relative;
+        }
+
+        .seance-block {
+            position: absolute;
+            left: 2px;
+            right: 2px;
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            overflow: hidden;
+            cursor: pointer;
+            border-left: 3px solid;
+            transition: transform 0.2s;
+            z-index: 10;
+        }
+
+        .seance-block:hover {
+            transform: scale(1.02);
+            z-index: 20;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .type-cours {
+            background: #ebf4ff;
+            border-color: #4299e1;
+            color: #2b6cb0;
+        }
+
+        .type-td {
+            background: #faf5ff;
+            border-color: #9f7aea;
+            color: #6b46c1;
+        }
+
+        .type-tp {
+            background: #f0fff4;
+            border-color: #48bb78;
+            color: #2f855a;
+        }
+
+        .hour-lines {
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            background: #eee;
+            z-index: 1;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="dashboard-page">
+    <aside class="sidebar">
+        <!-- Sidebar Identique -->
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <span class="logo-text">SeancePlus</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">Tableau de bord</a>
+            <a href="mon-emploi-du-temps.html" class="nav-item active">Mon Emploi du temps</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="logout()">Déconnexion</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div class="header-left">
+                <h1 class="page-title">Mon Emploi du temps</h1>
+            </div>
+            <div class="calendar-nav">
+                <button onclick="changeWeek(-1)">Précédent</button>
+                <span id="currentWeekRange" style="font-weight: 600; margin: 0 15px;">...</span>
+                <button onclick="changeWeek(1)">Suivant</button>
+                <button class="btn btn-outline" onclick="resetToToday()" style="margin-left: 10px;">Aujourd'hui</button>
+            </div>
+        </header>
+
+        <div class="card">
+            <div class="card-body" style="padding: 0;">
+                <div id="timetable" class="timetable-week">
+                    <!-- Généré par JS -->
+                    <div style="padding: 20px; text-align: center;">Chargement...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JS -->
+    <script src="../../js/api.js"></script>
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/enseignant-edt.js"></script>
+</body>
+
+</html>
