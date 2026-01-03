@@ -2,15 +2,15 @@
  * API Helper - Gestion des appels API vers le backend
  */
 
-const API_BASE_URL = 'http://127.0.0.1:3000/api';
-
-
+const API_BASE_URL = 'http://127.0.0.1:3000/api';  // Force 3000, pas 8080 !
+console.log('🔧 API_BASE_URL configurée à :', API_BASE_URL);  // Log pour debug - enlève-le après test
 
 /**
  * Wrapper pour les requêtes fetch avec gestion d'erreurs
  */
 async function apiRequest(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
+    console.log('📡 Appel API vers :', url, 'Méthode:', options.method || 'GET');
 
     // Configuration par défaut
     const config = {
@@ -62,6 +62,7 @@ const API = {
         login: (email, motDePasse) =>
             apiRequest('/auth/login', {
                 method: 'POST',
+                headers: { 'Content-Type': 'application/json' },  // Force pour éviter 405
                 body: JSON.stringify({ email, motDePasse })
             })
     },

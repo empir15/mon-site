@@ -2,29 +2,51 @@ const db = require('../config/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-exports.login = (req, res) => {
+exports.login = async (req, res) => {
   const { email, motDePasse } = req.body;
+  console.log('🔐 Tentative login pour email:', email);  // Log pour debug
 
-  db.query(
-    'SELECT * FROM utilisateur WHERE email = ?',
-    [email],
-    async (err, results) => {
-      if (err || results.length === 0)
-        return res.status(401).json({ message: 'Utilisateur non trouvé' });
+  if (!email || !motDePasse) {
+    return res.status(400).json({ message: 'Email et mot de passe requis' });
+  }
 
-      const user = results[0];
-      const match = await bcrypt.compare(motDePasse, user.mot_de_passe);
+  try {
+    const [results] = await db.query('SELECT * FROM utilisateur WHERE email = ?', [email]);
 
-      if (!match)
-        return res.status(401).json({ message: 'Mot de passe incorrect' });
-
-      const token = jwt.sign(
-        { id: user.id, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: '8h' }
-      );
-
-      res.json({ token, role: user.role });
+    if (results.length === 0) {
+      console.log('❌ User non trouvé:', email);
+      return res.status(401).json({ message: 'Utilisateur non trouvé' });
     }
-  );
+
+    const user = results[0];
+    const match = await bcrypt.compare(motDePasse, user.mot_de_passe);
+
+    if (!match) {
+      console.log('❌ Mot de passe incorrect pour:', email);
+      return res.status(401).json({ message: 'Mot de passe incorrect' });
+    }
+
+    const secret = process.env.JWT_SECRET || 'super_secret_default_2026';  // Fallback
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      secret,
+      { expiresIn: '8h' }
+    );
+
+    console.log('✅ Login réussi pour:', email, 'Rôle:', user.role);
+
+    // Renvoie token + user data (frontend l'attend)
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        nom: user.nom  // Ajoute nom si dispo
+      }
+    });
+  } catch (err) {
+    console.error('❌ Erreur login:', err);
+    res.status(500).json({ message: 'Erreur serveur lors du login' });
+  }
 };
