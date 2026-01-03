@@ -13,7 +13,8 @@ app.use(cors({
 }));
 
 // Gère les préflights OPTIONS pour éviter 405
-app.options('*', cors());
+app.options(/.*/, cors());
+
 
 // Middleware
 app.use(express.json());
