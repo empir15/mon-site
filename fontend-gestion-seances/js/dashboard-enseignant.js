@@ -32,27 +32,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadTeacherData(user) {
     try {
         console.log('🔄 Chargement données enseignant:', user.email);
-
-        // 1. Récupérer l'ID enseignant via users (jointure backend assumée)
-        const [users, seances, salles] = await Promise.all([
-            API.users.getAll(),
+        // Enseignant n'a pas accès à la liste complète des utilisateurs (403 Forbidden)
+        // On charge uniquement les séances et les salles
+        const [seances, salles] = await Promise.all([
             API.seances.getAll(),
             API.salles.getAll()
         ]);
 
-        // Trouver mon ID enseignant (via role + email/nom)
-        const myUser = users.find(u => u.email === user.email && u.role === 'ENSEIGNANT');
-        if (!myUser) {
-            console.error('❌ Profil enseignant non trouvé pour:', user.email);
-            showEmptyState('Aucun profil enseignant trouvé.');
-            return;
-        }
-
-        // Trouver enseignant_id dans table enseignant (assume API.users inclut id_enseignant ou filtre par nom pour proto)
-        // Note: Pour robustesse, ajoute un champ 'enseignant_id' dans user response backend si possible
-        const myEnseignant = { id: myUser.id };  // Remplace par vraie jointure si backend joint
-        // Filtre robuste par enseignant_id (ajuste si backend renvoie enseignant_id dans seances)
-        const mySeances = seances.filter(s => s.enseignant_id === myEnseignant.id || s.enseignant_nom === user.nom);
+        // Filtrons les séances pour cet enseignant
+        // On utilise le nom stocké dans l'objet user connecté
+        const mySeances = seances.filter(s => s.enseignant_nom === user.nom);
 
         console.log('📊 Mes séances trouvées:', mySeances.length);
 
