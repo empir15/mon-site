@@ -40,7 +40,11 @@ async function apiRequest(endpoint, options = {}) {
         }
 
         // Retourner la réponse JSON
-        return await response.json();
+        const data = await response.json();
+
+        console.log('Login Response:', data); // DEBUG
+
+        return data;
     } catch (error) {
         console.error('API Request Error:', error);
 

@@ -10,129 +10,84 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    document.getElementById('userName').textContent = user.nom || user.email;
-    document.getElementById('headerUserName').textContent = user.nom;
+    // Log pour debug
+    console.log('USER CONNECTÉ (Enseignant) :', user);
 
-    // Date
+    // Afficher nom utilisateur
+    const userNameElem = document.getElementById('userName');
+    const headerUserName = document.getElementById('headerUserName');
+    if (userNameElem) userNameElem.textContent = user.nom || user.email;
+    if (headerUserName) headerUserName.textContent = user.nom;
+
+    // Date actuelle
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('currentDateDisplay').textContent = new Date().toLocaleDateString('fr-FR', options);
+    const currentDateDisplay = document.getElementById('currentDateDisplay');
+    if (currentDateDisplay) {
+        currentDateDisplay.textContent = new Date().toLocaleDateString('fr-FR', options);
+    }
 
     await loadTeacherData(user);
 });
 
 async function loadTeacherData(user) {
     try {
-        // 1. Récupérer l'ID enseignant
-        // On charge tous les utilisateurs pour trouver la correspondance (solution temporaire faute d'endpoint /me)
+        console.log('🔄 Chargement données enseignant:', user.email);
+
+        // 1. Récupérer l'ID enseignant via users (jointure backend assumée)
         const [users, seances, salles] = await Promise.all([
             API.users.getAll(),
             API.seances.getAll(),
             API.salles.getAll()
         ]);
 
-        // Trouver mon profil enseignant
-        // Note: L'API users.getAll retourne la table utilisateur. 
-        // On a besoin de savoir quel est mon ID dans la table 'enseignant' ou si l'API user retourne déjà ça.
-        // Si l'API backend est bien faite, elle joint les tables.
-        // Supposons que nous devons filtrer les séances où enseignant_id correspond.
-        // Problème : on a besoin de l'ID de la table 'enseignant'.
+        // Trouver mon ID enseignant (via role + email/nom)
+        const myUser = users.find(u => u.email === user.email && u.role === 'ENSEIGNANT');
+        if (!myUser) {
+            console.error('❌ Profil enseignant non trouvé pour:', user.email);
+            showEmptyState('Aucun profil enseignant trouvé.');
+            return;
+        }
 
-        // Comme nous n'avons pas d'endpoint facile pour "mon profit enseignant", 
-        // nous allons ruser : filtrer les séances où le NOM de l'enseignant correspond à mon nom.
-        // C'est fragile mais ça marche pour le prototype si les noms sont uniques.
+        // Trouver enseignant_id dans table enseignant (assume API.users inclut id_enseignant ou filtre par nom pour proto)
+        // Note: Pour robustesse, ajoute un champ 'enseignant_id' dans user response backend si possible
+        const myEnseignant = { id: myUser.id };  // Remplace par vraie jointure si backend joint
+        // Filtre robuste par enseignant_id (ajuste si backend renvoie enseignant_id dans seances)
+        const mySeances = seances.filter(s => s.enseignant_id === myEnseignant.id || s.enseignant_nom === user.nom);
 
-        // Meilleure approche : filtrer par utilisateur_id si disponible, sinon nom.
+        console.log('📊 Mes séances trouvées:', mySeances.length);
 
-        // Filtrons les séances pour cet enseignant
-        // L'objet seance contient 'enseignant_nom' (jointure backend).
-        const mySeances = seances.filter(s => s.enseignant_nom === user.nom);
+        // 2. Stats : Prochain cours
+        const today = new Date().toISOString().split('T')[0];
+        const todaySeances = mySeances.filter(s => s.date === today).sort((a, b) => a.heure_debut.localeCompare(b.heure_debut));
+        const nextCourse = todaySeances[0];
+        const nextTimeElem = document.getElementById('nextCourseTime');
+        if (nextTimeElem) {
+            nextTimeElem.textContent = nextCourse ? nextCourse.heure_debut.substring(0, 5) : '--:--';
+        }
 
-        calculateStats(mySeances);
-        displaySessions(mySeances, salles);
+        // 3. Rendu listes
+        renderList('todaysSessions', todaySeances);
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+        const tomorrowSeances = mySeances.filter(s => s.date === tomorrowStr).sort((a, b) => a.heure_debut.localeCompare(b.heure_debut));
+        renderList('tomorrowsSessions', tomorrowSeances);
 
     } catch (error) {
-        console.error('Erreur chargement:', error);
-        document.getElementById('todaysSessions').innerHTML = '<p class="error-msg">Erreur de chargement des données.</p>';
+        console.error('❌ Erreur chargement enseignant:', error);
+        showEmptyState('Erreur de chargement. Vérifiez votre connexion.');
     }
-}
-
-function calculateStats(seances) {
-    // Heures cette semaine
-    const now = new Date();
-    const startOfWeek = new Date(now);
-    const day = startOfWeek.getDay() || 7;
-    startOfWeek.setHours(-24 * (day - 1)); // Lundi
-
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(endOfWeek.getDate() + 7);
-
-    let hours = 0;
-
-    // Prochain cours
-    let nextCourse = null;
-    let minDiff = Infinity;
-
-    seances.forEach(s => {
-        const date = new Date(s.date);
-
-        // Heures semaine
-        if (date >= startOfWeek && date < endOfWeek) {
-            const [h1, m1] = s.heure_debut.split(':').map(Number);
-            const [h2, m2] = s.heure_fin.split(':').map(Number);
-            hours += (h2 + m2 / 60) - (h1 + m1 / 60);
-        }
-
-        // Prochain cours (date future la plus proche)
-        const seanceStart = new Date(`${s.date}T${s.heure_debut}`);
-        const diff = seanceStart - now;
-
-        if (diff > 0 && diff < minDiff) {
-            minDiff = diff;
-            nextCourse = s;
-        }
-    });
-
-    document.getElementById('hoursThisWeek').textContent = Math.round(hours) + 'h';
-
-    if (nextCourse) {
-        const isToday = new Date(nextCourse.date).toDateString() === now.toDateString();
-        const dayStr = isToday ? 'Aujourd\'hui' : new Date(nextCourse.date).toLocaleDateString('fr-FR', { weekday: 'short' });
-        document.getElementById('nextCourseTime').innerHTML = `
-            ${dayStr} <br>
-            <span style="font-size:0.8em">${nextCourse.heure_debut} - ${nextCourse.salle_nom || '?'}</span>
-        `;
-    } else {
-        document.getElementById('nextCourseTime').textContent = "Aucun";
-    }
-}
-
-function displaySessions(seances, salles) {
-    const today = new Date().toISOString().split('T')[0];
-
-    const tomorrowDate = new Date();
-    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-    const tomorrow = tomorrowDate.toISOString().split('T')[0];
-
-    const todaySessions = seances
-        .filter(s => s.date === today)
-        .sort((a, b) => a.heure_debut.localeCompare(b.heure_debut));
-
-    const tomorrowSessions = seances
-        .filter(s => s.date === tomorrow)
-        .sort((a, b) => a.heure_debut.localeCompare(b.heure_debut));
-
-    renderList('todaysSessions', todaySessions);
-    renderList('tomorrowsSessions', tomorrowSessions);
 }
 
 function renderList(containerId, list) {
     const container = document.getElementById(containerId);
+    if (!container) return;
 
     if (list.length === 0) {
         container.innerHTML = `
             <div class="card">
                 <div class="card-body" style="color: var(--gray); font-style: italic;">
-                    Aucun cours prévu.
+                    Aucune séance prévue.
                 </div>
             </div>`;
         return;
@@ -151,7 +106,7 @@ function renderList(containerId, list) {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                         </svg>
-                        ${s.salle_nom || 'Salle inconnue'}
+                        ${escapeHtml(s.salle_nom || 'Salle inconnue')}
                     </span>
                     <span class="status-badge status-${s.statut.toLowerCase()}">
                         ${s.statut}
@@ -167,4 +122,11 @@ function renderList(containerId, list) {
 
 function escapeHtml(text) {
     return text ? text.replace(/</g, "&lt;") : '';
+}
+
+function showEmptyState(message) {
+    const main = document.querySelector('main');
+    if (main) {
+        main.innerHTML = `<div class="empty-state"><p>${message}</p></div>`;
+    }
 }

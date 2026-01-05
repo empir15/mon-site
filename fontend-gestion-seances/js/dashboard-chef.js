@@ -3,12 +3,14 @@
  */
 
 // Vérifier l'authentification au chargement
-console.log('USER CONNECTÉ :', user);
 
 document.addEventListener('DOMContentLoaded', async () => {
     const user = requireAuth();
 
     if (!user) return;
+
+    // Log pour debug (maintenant après définition de user)
+    console.log('USER CONNECTÉ :', user);
 
     // Vérifier le rôle
     if (user.role !== 'CHEF_DEPARTEMENT') {
@@ -40,6 +42,8 @@ async function loadDashboardData() {
         ]);
     } catch (error) {
         console.error('Erreur chargement dashboard:', error);
+        // Optionnel : Afficher une alerte user-friendly
+        showAlert('Erreur lors du chargement des données. Réessayez plus tard.', 'error');
     }
 }
 
@@ -279,7 +283,6 @@ async function loadOccupationSalles() {
 /**
  * Utilitaires
  */
-
 function formatDate(dateString) {
     const date = new Date(dateString);
     const options = { weekday: 'short', day: 'numeric', month: 'short' };
@@ -289,4 +292,19 @@ function formatDate(dateString) {
 function parseTime(timeString) {
     const [hours, minutes] = timeString.split(':').map(Number);
     return hours + minutes / 60;
+}
+
+function escapeHtml(text) {
+    return text ? text.replace(/</g, "&lt;") : '';
+}
+
+// Assume showAlert de auth.js est global
+function showAlert(message, type = 'error') {
+    // Implémente ou utilise celle de auth.js
+    const alertElement = document.getElementById('alertMessage') || document.createElement('div');
+    alertElement.textContent = message;
+    alertElement.className = `alert ${type}`;
+    alertElement.style.display = 'block';
+    document.body.appendChild(alertElement);
+    setTimeout(() => alertElement.remove(), 5000);
 }

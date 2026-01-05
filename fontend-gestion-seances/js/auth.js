@@ -67,10 +67,20 @@ async function handleLogin(event) {
         const storage = remember ? localStorage : sessionStorage;
 
         storage.setItem('token', response.token);
+
+        // La réponse backend est { token, user: { ... } }
+        // Si l'API retourne directement le user à la racine (ancienne version), on gère les deux cas
+        const userData = response.user || response;
+
         storage.setItem('user', JSON.stringify({
-            email,
-            role: response.role
+            id: userData.id,
+            nom: userData.nom,
+            email: userData.email || email,
+            role: userData.role
         }));
+
+        // Rediriger vers le dashboard approprié
+        const role = userData.role;
 
 
         // Afficher succès
@@ -78,7 +88,7 @@ async function handleLogin(event) {
 
         // Rediriger vers le dashboard approprié
         setTimeout(() => {
-            redirectToDashboard(response.role);
+            redirectToDashboard(role);
         }, 1000);
 
     } catch (error) {
